@@ -1,0 +1,142 @@
+{{ $isoimages := .IsoImages }}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <title>Simple VM Control UI</title>
+   <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+   {{if .MessageSuccess }}
+   <div class="flash-message green">
+      <p><strong>Success:</strong> {{ .MessageSuccess }}</p>
+   </div>
+   {{end}}
+
+   {{if .MessageError }}
+   <div class="flash-message red">
+      <p><strong>Error:</strong> {{ .MessageError }}</p>
+   </div>
+   {{end}}
+
+   <h2>Current VMs</h2>
+   <form method="get" action="/">
+      <p><button type="submit">Refresh</button></p>
+   </form>
+
+   <table class="vmlist">
+      <tr>
+         <th>Name</th>
+         <th>Memory</th>
+         <th>Cores</th>
+         <th>State</th>
+         <th>Auto start</th>
+         <th>Console VNC</th>
+         <th>Control</th>
+         <th>Current mounts</th>
+         <th>Create data disk</th>
+      </tr>
+      {{range $domain := .Domains}}
+      <tr>
+         <td>{{ .Name }}</td>
+         <td>{{ .Memory }}</td>
+         <td>{{ .Cores }}</td>
+         <td>{{ .State }}</td>
+         <td>{{ .Autostart }}</td>
+         <td><a href="/assets/vnc.html?shared=0&port=2015&path=websockify/{{ .Name }}&encrypt=0" target="_blank">{{ .Vnc }}</td>
+         <td>
+            {{if .IsRunning}}
+               <button type="button" class="red" onclick="if(confirm('Are you sure you want to stop {{ .Name }}?')) window.location = '/stop/{{ .Name }}'">Stop</button><br/>
+            {{end}}
+            {{if .IsNotRunning}}
+               <button type="button" class="green" onclick="window.location = '/start/{{ .Name }}'">Start</button><br/>
+            {{end}}
+
+            <button type="button" class="red" onclick="if(prompt('Type {{ .Name }} below to confirm that you really want to this VM and all its data disks.') == '{{ .Name }}') window.location = '/delete/{{ .Name }}'">Delete</button><br/>
+            {{if .IsAutostart}}
+               <button type="button" onclick="window.location = '/setautostart/{{ .Name }}/off'">Autostart off</button>
+            {{end}}
+            {{if .IsNotAutostart}}
+               <button type="button" onclick="window.location = '/setautostart/{{ .Name }}/on'">Autostart on</button><br/>
+            {{end}}
+         </td>
+         <td>
+            <table class="blkdevlist">
+               <tr>
+                  <th>Dev</th>
+                  <th>File</th>
+                  <th>Current</th>
+                  <th>Max</th>
+                  <th>Control</th>
+               </tr>
+            {{range .Disks}}
+               <tr>
+                  <td>{{ .Dev }}</td>
+                  <td>{{ .File }}</td>
+                  <td>{{ .Current }}</td>
+                  <td>{{ .Max }}</td>
+                  <td>
+                     {{if .IsImageData}}
+                     <button type="button" class="red" name="deletedatadisk" onclick="if(prompt('Type {{ $domain.Name }} below to confirm that you really want to delete the data disk {{ .File }}') == '{{ $domain.Name }}') window.location = '/deletedisk/{{ $domain.Name }}/{{ .Dev }}'">Delete</button>
+                     {{end}}
+                  </td>
+               </tr>
+            {{end}}
+            </table>
+            <br/>
+            <select id="mount_iso_{{ .Name }}">
+               <option value="">Eject</option>
+               {{range $isoimage := $isoimages}}
+               <option value="{{ $isoimage }}">{{ $isoimage }}</option>
+               {{end}}
+            </select><br/>
+            <button type="button" onclick="window.location = '/mountiso/{{ .Name }}/' + document.getElementById('mount_iso_{{ .Name }}').value">Change ISO in cdrom</button>
+         </td>
+         <td>
+            Grow to max <input id="datadisk_size_{{ .Name }}" size="3" /> GB<br/>
+            <button type="button" name="createdatadisk" onclick="window.location = '/createdisk/{{ .Name }}/' + document.getElementById('datadisk_size_{{ .Name }}').value">Create</button>
+         </td>
+      </tr>   
+      {{end}}
+   </table>
+
+   <h2>Create new VM</h2>
+   <form method="post" action="/create">
+      <table>
+         <tr>
+            <td>Name</td>
+            <td><input type="text" name="vmname"/></td>
+         </tr>
+         <tr>
+            <td>Cores</td>
+            <td><input type="text" name="cores" value="2"/></td>
+         </tr>
+         <tr>
+            <td>Memory</td>
+            <td><input type="text" name="memory" value="256"/> MB</td>
+         </tr>
+         <tr>
+            <td>OS disk size</td>
+            <td><input type="text" name="osdisksize" value="10"/> GB</td>
+         </tr>
+         <tr>
+            <td>OS installer ISO</td>
+            <td>
+               <select name="installiso">
+                  {{range $isoimage := $isoimages}}
+                  <option value="{{ $isoimage }}">{{ $isoimage }}</option>
+                  {{end}}
+               </select>
+            </td>
+         </tr>
+         <tr>
+            <td><button type="submit" name="create" value="create">Create</button></td>
+            <td></td>
+         </tr>
+      </table>
+   </form>
+</body>
+</html>

@@ -1,0 +1,58 @@
+body { font-family: sans-serif; color: #777; line-height: 1.6; font-size: 14px; }
+
+h2 {
+	margin: 1em 0;
+font-weight: 300;
+color: #333;
+}
+
+table {
+	border-collapse: collapse;
+	border: 1px solid #cbcbcb;
+}
+
+th { text-align: left; background-color: #e0e0e0; padding: 5px 10px; color: black; }
+td { padding: 5px 10px; }
+th, td {
+	border-left: 1px solid #cbcbcb;
+}
+tr:nth-child(2n-1) td {
+	background-color: #f2f2f2	
+}
+
+button {
+    background-color: #1f8dd6; /* Blue */
+    border: none;
+    color: white;
+    padding: 5px 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+}
+button.red {
+	    background-color: #dd514c; /* Red */
+}
+button.green {
+    background-color: #5eb95e; /* Green */
+
+}
+
+.flash-message {
+    position: fixed;
+    width: 500px;
+    left: 50%;
+    top: 2em;
+    margin-left: -250px;
+    color: #ffffff;
+    font-size: 13px;
+    padding: 0.3em 1em;
+    background: #1f8dd6;
+    border-radius: 3px;
+ }
+.flash-message.green {
+    background: #5eb95e
+}
+.flash-message.red {
+    background: #dd514c
+}
