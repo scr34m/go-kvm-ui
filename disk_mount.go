@@ -9,7 +9,6 @@ import (
 	"github.com/scr34m/go-kvm-ui/domain"
 )
 
-// https://github.com/allanrbo/simple-vmcontrol/blob/master/vmcontrol/createdatadisk.py
 func mountDisk(w http.ResponseWriter, r *http.Request) {
 
 	parts := strings.Split(r.URL.Path, "/")
@@ -86,5 +85,5 @@ func mountDisk(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Redirect(w, r, "/?error=false", 302)
+	http.Redirect(w, r, "/?error=false", http.StatusTemporaryRedirect)
 }

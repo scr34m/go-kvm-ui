@@ -23,7 +23,6 @@ func difference(a, b []string) []string {
 	return ab
 }
 
-// http://www.alexedwards.net/blog/simple-flash-messages-in-golang
 func SetFlash(w http.ResponseWriter, name string, value []byte) {
 	c := &http.Cookie{Name: name, Value: encode(value)}
 	http.SetCookie(w, c)

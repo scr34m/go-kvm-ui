@@ -11,7 +11,6 @@ import (
 	"github.com/scr34m/go-kvm-ui/domain"
 )
 
-// https://github.com/allanrbo/simple-vmcontrol/blob/master/vmcontrol/createdatadisk.py
 func createDisk(w http.ResponseWriter, r *http.Request) {
 
 	parts := strings.Split(r.URL.Path, "/")
@@ -22,7 +21,7 @@ func createDisk(w http.ResponseWriter, r *http.Request) {
 
 	domain := domain.Load(vmname)
 	if domain == nil {
-		http.Redirect(w, r, "/?error=Unknown+virtual+machine+\""+vmname+"\"", 302)
+		http.Redirect(w, r, "/?error=Unknown+virtual+machine+\""+vmname+"\"", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -56,7 +55,7 @@ func createDisk(w http.ResponseWriter, r *http.Request) {
 		out, err := exec.Command("/usr/bin/qemu-img", args...).CombinedOutput()
 		if err != nil {
 			log.Printf("command: %v, output: %s error: %v", args, out, err)
-			http.Redirect(w, r, "/?error=Unable+to+create+virtual+machine+\""+vmname+"\"+disk, error: "+err.Error(), 302)
+			http.Redirect(w, r, "/?error=Unable+to+create+virtual+machine+\""+vmname+"\"+disk, error: "+err.Error(), http.StatusTemporaryRedirect)
 			return
 		}
 
@@ -74,10 +73,10 @@ func createDisk(w http.ResponseWriter, r *http.Request) {
 		out, err = exec.Command("/usr/bin/virsh", args...).CombinedOutput()
 		if err != nil {
 			log.Printf("command: %v, output: %s error: %v", args, out, err)
-			http.Redirect(w, r, "/?error=Unable+to+attach+virtual+machine+\""+vmname+"\"+disk, error: "+err.Error(), 302)
+			http.Redirect(w, r, "/?error=Unable+to+attach+virtual+machine+\""+vmname+"\"+disk, error: "+err.Error(), http.StatusTemporaryRedirect)
 			return
 		}
 	}
 
-	http.Redirect(w, r, "/?success=Virtual+machine+\""+vmname+"\"+disk+has+been+created", 302)
+	http.Redirect(w, r, "/?success=Virtual+machine+\""+vmname+"\"+disk+has+been+created", http.StatusTemporaryRedirect)
 }
