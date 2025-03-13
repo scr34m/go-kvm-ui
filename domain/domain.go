@@ -28,7 +28,7 @@ func (disk *DeviceDisk) IsImageData() bool {
 func getXml(name string) []byte {
 	out, err := exec.Command("/usr/bin/virsh", "dumpxml", name).CombinedOutput()
 	if err != nil {
-		log.Fatalf("output: %s error: %v", out, err)
+		log.Fatalf("getXml: %s error: %v", out, err)
 	}
 	return out
 }
@@ -48,9 +48,9 @@ func getDiskSize(file string) (int64, int64) {
 	}
 
 	if _, err := os.Stat(file); !os.IsNotExist(err) {
-		out, err := exec.Command("/usr/bin/qemu-img", "info", file).CombinedOutput()
+		out, err := exec.Command("/usr/bin/qemu-img", "info", "-U", file).CombinedOutput()
 		if err != nil {
-			log.Fatalf("output: %s error: %v", out, err)
+			log.Fatalf("getDiskSize: %s error: %v", out, err)
 		}
 
 		rx := regexp.MustCompile(`virtual size: [^\(]+\((\d+)`)
@@ -92,7 +92,7 @@ func Load(vmname string) *Domain {
 
 	out, err := exec.Command("/usr/bin/virsh", "list", "--all").CombinedOutput()
 	if err != nil {
-		log.Fatalf("output: %s error: %v", out, err)
+		log.Fatalf("Load: %s error: %v", out, err)
 	}
 
 	rx := regexp.MustCompile(`([0-9\-]+)\s+([a-z0-9]+)\s+(running|blocked|paused|shutdown|shut off|crashed|inactive)`)
@@ -117,7 +117,7 @@ func LoadAll() []Domain {
 
 	out, err := exec.Command("/usr/bin/virsh", "list", "--all").CombinedOutput()
 	if err != nil {
-		log.Fatalf("output: %s error: %v", out, err)
+		log.Fatalf("LoadAll: %s error: %v", out, err)
 	}
 
 	rx := regexp.MustCompile(`([0-9\-]+)\s+([a-z0-9]+)\s+(running|blocked|paused|shutdown|shut off|crashed|inactive)`)
